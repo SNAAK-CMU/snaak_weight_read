@@ -4,7 +4,7 @@ import re
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Float64
-from weight_service.srv import ReadWeight
+from snaak_weight_read.srv import ReadWeight
 
 
 class WeightServiceNode(Node):
@@ -18,7 +18,8 @@ class WeightServiceNode(Node):
         self.max_history_size = 10
 
         self.timer = self.create_timer(0.01, self.read_weight)      
-        self.srv = self.create_service(ReadWeight, 'Read_Weight', self.weight_service_callback)  
+        self.srv = self.create_service(ReadWeight, f'snaak_weight_read/{self.get_name()}/read_weight', self.weight_service_callback)  
+        self.serial_port = serial.Serial(serial_port, 9600, timeout=1)
         self.serial_port = serial.Serial(serial_port, 9600, timeout=1)
 
     def read_weight(self):

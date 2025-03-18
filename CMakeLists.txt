@@ -23,12 +23,14 @@ rosidl_generate_interfaces(${PROJECT_NAME}
 rosidl_get_typesupport_target(cpp_typesupport_target
   ${PROJECT_NAME} "rosidl_typesupport_cpp")
 
-# Set up Python installation
-#ament_python_install_package(${PROJECT_NAME})
+install(DIRECTORY
+  launch
+  DESTINATION share/${PROJECT_NAME}
+)
 
 # Install Python scripts
 install(PROGRAMS
-  scripts/weight_service_node.py
+  scripts/snaak_weight_service_node.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
