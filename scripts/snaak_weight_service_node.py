@@ -26,7 +26,9 @@ class WeightServiceNode(Node):
         serial_data = self.serial_port.readline().decode('utf-8').strip()
         if (serial_data != ''):
             try:
-                weight = float(re.findall(r'-?\d+\.?\d*', serial_data)[0])
+                weight = float(re.findall(r'\d+\.?\d*', serial_data)[0])
+                if '-' in serial_data:
+                    weight = -weight
                 self.weight_history.append(weight)
                 if len(self.weight_history) > self.max_history_size:
                     self.weight_history.pop(0)
