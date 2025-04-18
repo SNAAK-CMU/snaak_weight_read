@@ -5,7 +5,7 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Float64
 from snaak_weight_read.srv import ReadWeight
-
+import time
 
 class WeightServiceNode(Node):
     def __init__(self):
@@ -20,7 +20,13 @@ class WeightServiceNode(Node):
         self.timer = self.create_timer(0.01, self.read_weight)      
         self.srv = self.create_service(ReadWeight, f'snaak_weight_read/{self.get_name()}/read_weight', self.weight_service_callback)  
         self.serial_port = serial.Serial(serial_port, 9600, timeout=1)
-        self.serial_port = serial.Serial(serial_port, 9600, timeout=1)
+
+        while rclpy.ok():
+            if self.serial_port.in_waiting > 0: break
+            else: self.get_logger().info("Waiting for serial port to be ready...")
+            time.sleep(0.2)
+        self.serial_port.flushInput()
+        self.get_logger().info(f"Weighing Scale Node Started")
 
     def read_weight(self):
         serial_data = self.serial_port.readline().decode('utf-8').strip()
