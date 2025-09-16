@@ -18,7 +18,7 @@ def generate_launch_description():
             name='snaak_scale_bins',
             parameters=[
                 {'node_name': 'snaak_scale_bins'},
-                {'serial_port': '/dev/snaak_scale_bins'}
+                {'serial_port': '/dev/snaak_scale_bins_right'}
             ]
         )
     ])
