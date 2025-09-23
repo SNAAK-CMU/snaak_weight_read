@@ -15,10 +15,19 @@ def generate_launch_description():
         Node(
             package='snaak_weight_read',
             executable='snaak_weight_service_node.py',
-            name='snaak_scale_bins',
+            name='snaak_scale_bins_right',
             parameters=[
-                {'node_name': 'snaak_scale_bins'},
+                {'node_name': 'snaak_scale_bins_right'},
                 {'serial_port': '/dev/snaak_scale_bins_right'}
+            ]
+        ),
+        Node(
+            package='snaak_weight_read',
+            executable='snaak_weight_service_node.py',
+            name='snaak_scale_bins_left',
+            parameters=[
+                {'node_name': 'snaak_scale_bins_left'},
+                {'serial_port': '/dev/snaak_scale_bins_left'}
             ]
         )
     ])
