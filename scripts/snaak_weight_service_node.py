@@ -21,6 +21,7 @@ class WeightServiceNode(Node):
         self.srv = self.create_service(ReadWeight, f'snaak_weight_read/{self.get_name()}/read_weight', self.weight_service_callback)  
         self.serial_port = serial.Serial(serial_port, 9600, timeout=1)
         
+        self.timer = self.create_timer(0.01, self.read_weight)      
         self.publisher = self.create_publisher(Float64, f'snaak_weight_read/{self.get_name()}/weight', 10)
         self.publisher_timer = self.create_timer(0.5, self.publish_weight)
 
@@ -35,14 +36,18 @@ class WeightServiceNode(Node):
         serial_data = self.serial_port.readline().decode('utf-8').strip()
         if (serial_data != ''):
             try:
-                weight = float(re.findall(r'\d+\.?\d*', serial_data)[0])
-                if '-' in serial_data:
-                    weight = -weight
-                self.weight_history.append(weight)
-                if len(self.weight_history) > self.max_history_size:
-                    self.weight_history.pop(0)
+                weight_parsing = re.findall(r'\d+\.?\d*', serial_data)
+                if (weight_parsing):
+                    weight = float(weight_parsing[0])
+                    if '-' in serial_data:
+                        weight = -weight
+                    self.weight_history.append(weight)
+                    if len(self.weight_history) > self.max_history_size:
+                        self.weight_history.pop(0)
 
-                self.weight = sum(self.weight_history) / len(self.weight_history)
+                    self.weight = sum(self.weight_history) / len(self.weight_history)
+                else:
+                    self.get_logger().warn(f"No weight data found in: {serial_data}")
             except ValueError:
                 self.get_logger().warn(f"Invalid data received: {serial_data}")
 
