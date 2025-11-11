@@ -6,6 +6,7 @@ from rclpy.node import Node
 from std_msgs.msg import Float64
 from snaak_weight_read.srv import ReadWeight
 import time
+from scipy.signal import medfilt
 
 class WeightServiceNode(Node):
     def __init__(self):
@@ -45,7 +46,8 @@ class WeightServiceNode(Node):
                     if len(self.weight_history) > self.max_history_size:
                         self.weight_history.pop(0)
 
-                    self.weight = sum(self.weight_history) / len(self.weight_history)
+                    # use median instead of mean to help deal with outliers
+                    self.weight = medfilt(self.weight_history, kernel_size=len(self.weight))
                 else:
                     self.get_logger().warn(f"No weight data found in: {serial_data}")
             except ValueError:
