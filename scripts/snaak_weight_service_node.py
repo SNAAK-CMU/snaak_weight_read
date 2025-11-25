@@ -6,6 +6,7 @@ from rclpy.node import Node
 from std_msgs.msg import Float64
 from snaak_weight_read.srv import ReadWeight
 import time
+import numpy as np
 
 class WeightServiceNode(Node):
     def __init__(self):
@@ -45,16 +46,16 @@ class WeightServiceNode(Node):
                     if len(self.weight_history) > self.max_history_size:
                         self.weight_history.pop(0)
 
-                    self.weight = sum(self.weight_history) / len(self.weight_history)
+                    # use median instead of mean to help deal with outliers
+                    self.weight = np.median(self.weight_history)
                 else:
                     self.get_logger().warn(f"No weight data found in: {serial_data}")
             except ValueError:
                 self.get_logger().warn(f"Invalid data received: {serial_data}")
 
     def weight_service_callback(self, request, response):
-        # Ensure response.weight is of type Float64
         response.weight = Float64()
-        response.weight.data = self.weight  # Assign the float value to the 'data' field
+        response.weight.data = self.weight
         return response
 
     def publish_weight(self):
